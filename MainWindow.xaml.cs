@@ -63,6 +63,7 @@ namespace WPFLAB
             //this.DataContext = Circles;
             ((INotifyCollectionChanged)circlesDataGrid.Items).CollectionChanged += Circles_CollectionChanged;
 
+            DrawCircles();
             
 
         }
@@ -84,7 +85,7 @@ namespace WPFLAB
                 timer.Stop();
                 stopwatch.Stop();
                 stopwatch.Reset();
-                DrawCircles();
+                //DrawCircles();
 
             }
 
@@ -136,7 +137,7 @@ namespace WPFLAB
 
 
 
-        private void DrawCircles()
+        private void DrawCircle()
         {
             var previousCircle = (Circle)null;
             foreach (var item in circlesDataGrid.Items.SourceCollection)

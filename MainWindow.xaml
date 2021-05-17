@@ -57,7 +57,7 @@
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <GroupBox Header="Plotter" Grid.Column="0">
-                    <Canvas Name="Plotter" Background="White" />
+                    <Canvas Name="Plotter"/>
                 </GroupBox>
                 <GroupBox Header="Circles" Grid.Column="1" >
 
