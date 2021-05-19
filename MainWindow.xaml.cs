@@ -61,39 +61,33 @@ namespace WPFLAB
             var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
             SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU);
 
-            this.DataContext = new ObservableCollection<Circle> { new Circle { Radius = 200, Frequency = 1 } };
+            ObservableCollection < Circle > Circles    = new ObservableCollection<Circle> { new Circle { Radius = 200, Frequency = 1 } };
+            this.DataContext = Circles;
             timer.Interval = TimeSpan.FromMilliseconds(1);
             timer.Tick += Tick;
             
             //this.DataContext = Circles;
-            ((INotifyCollectionChanged)circlesDataGrid.Items).CollectionChanged += Circles_CollectionChanged;
-            CanvasCenter = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+            //((INotifyCollectionChanged)circlesDataGrid.Items).CollectionChanged += Circles_CollectionChanged;
+            
             DrawnGeometries.Geometry = ellipses;
             DrawnGeometries.Pen = new Pen(new SolidColorBrush(Colors.Black),2);
             DrawnImages.Drawing = DrawnGeometries;
             Canvas.Source = DrawnImages;
             //DrawCircles();
 
-            foreach (Circle c in circlesDataGrid.Items.SourceCollection)
-            {
-                CanvasCenter.X += c.Radius / 2;
-            }
 
 
 
         }
 
-        private void Circles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-
-            //DrawCircles();
-        }
 
         public async void Tick(object sender, EventArgs e)
         {
             if (stopwatch.Elapsed.TotalSeconds < 10)
             {
                 ProgressBar.Value = stopwatch.ElapsedMilliseconds;
+                //RotateTransform rt = new RotateTransform(10000/360);
+                //ellipses.Transform = rt;
             }
             else
             {
@@ -114,6 +108,8 @@ namespace WPFLAB
         {
             timer.Start();
             stopwatch.Start();
+
+
         }
 
         private void Pause_Clicked(object sender, RoutedEventArgs e)
@@ -178,7 +174,7 @@ namespace WPFLAB
         {
             if (c != null)
             {
-                CanvasCenter.X += c.Radius - c.Radius/2;
+                CanvasCenter.X += c.Radius/2;
                 c.ellipse = new EllipseGeometry(CanvasCenter, c.Radius, c.Radius);
                 ellipses.Children.Add(c.ellipse);
 
@@ -203,7 +199,15 @@ namespace WPFLAB
                 var addedCircle = e.Row.Item as Circle;
                 AddCircleToGeometryGroup(addedCircle);
 
+                
+
             }
+        }
+
+        private void Canvas_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            //Image image = sender as Image;
+            CanvasCenter = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
         }
     }
 }

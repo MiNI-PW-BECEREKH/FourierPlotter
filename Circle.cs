@@ -30,7 +30,7 @@ namespace WPFLAB
             set
             {
                 radius = value;
-                //OnPropertyChanged();
+                OnPropertyChanged();
             }
         }
 

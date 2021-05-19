@@ -57,13 +57,13 @@
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <GroupBox Header="Plotter" Grid.Column="0">
-                    <Image Name="Canvas">
+                    <Image Name="Canvas" Loaded="Canvas_OnLoaded">
                     </Image>
                 </GroupBox>
                 <GroupBox Header="Circles" Grid.Column="1" >
 
                     <Grid>
-                        <DataGrid RowEditEnding="CirclesDataGrid_OnRowEditEnding" LoadingRow="CirclesDataGrid_OnLoadingRow" ItemsSource="{Binding  }"  AutoGenerateColumns="False" CanUserAddRows="True"
+                        <DataGrid  RowEditEnding="CirclesDataGrid_OnRowEditEnding" LoadingRow="CirclesDataGrid_OnLoadingRow" ItemsSource="{Binding  }"  AutoGenerateColumns="False" CanUserAddRows="True"
                                   VerticalScrollBarVisibility="Visible"
                                   HorizontalAlignment="Center"
                                   Name="circlesDataGrid" 
