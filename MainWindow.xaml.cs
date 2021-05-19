@@ -41,6 +41,11 @@ namespace WPFLAB
         private DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         private Stopwatch stopwatch = new Stopwatch();
         private bool IsPaused { get; set; } = false;
+        private GeometryGroup ellipses = new GeometryGroup();
+        private Point CanvasCenter = new Point();
+        private GeometryDrawing DrawnGeometries = new GeometryDrawing();
+        private DrawingImage DrawnImages = new DrawingImage();
+
 
         public MainWindow()
         {
@@ -62,9 +67,13 @@ namespace WPFLAB
             
             //this.DataContext = Circles;
             ((INotifyCollectionChanged)circlesDataGrid.Items).CollectionChanged += Circles_CollectionChanged;
+            CanvasCenter = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+            DrawnGeometries.Geometry = ellipses;
+            DrawnGeometries.Pen = new Pen(new SolidColorBrush(Colors.Black),2);
+            DrawnImages.Drawing = DrawnGeometries;
+            Canvas.Source = DrawnImages;
+            //DrawCircles();
 
-            DrawCircles();
-            
 
         }
 
@@ -112,7 +121,7 @@ namespace WPFLAB
             ProgressBar.Value = 0;
             stopwatch.Reset();
             timer.Stop();
-            Plotter.Children.Clear();
+            //Plotter.Children.Clear();
         }
 
         private void MenuItem_OnChecked(object sender, RoutedEventArgs e)
@@ -121,7 +130,7 @@ namespace WPFLAB
             foreach (var item in circlesDataGrid.Items.SourceCollection)
             {
                 Circle c = item as Circle;
-                c.ellipse.Visibility = Visibility.Visible;
+                //c.ellipse.Visibility = Visibility.Visible;
             }
         }
 
@@ -131,34 +140,64 @@ namespace WPFLAB
             foreach (var item in circlesDataGrid.Items.SourceCollection)
             {
                 Circle c = item as Circle;
-                c.ellipse.Visibility = Visibility.Hidden;
+                //c.ellipse.Visibility = Visibility.Hidden;
             }
         }
 
 
 
-        private void DrawCircle()
+        //private void DrawCircle()
+        //{
+        //    var previousCircle = (Circle)null;
+        //    foreach (var item in circlesDataGrid.Items.SourceCollection)
+        //    {
+        //        var circleItem = item as Circle;
+        //        if (previousCircle != null)
+        //        {
+
+        //            circleItem.HorizontalRight = (int)(previousCircle.HorizontalRight + circleItem.ellipse.Width / 2);
+        //            Canvas.SetLeft(circleItem.ellipse, previousCircle.HorizontalRight - circleItem.ellipse.Width / 2);
+        //        }
+        //        else
+        //        {
+        //            circleItem.HorizontalRight = (int)(Plotter.ActualWidth / 2 + circleItem.ellipse.Width / 2);
+        //            Canvas.SetLeft(circleItem.ellipse, Plotter.ActualWidth / 2 - circleItem.ellipse.Width / 2);
+        //        }
+        //        Canvas.SetTop(circleItem.ellipse, Plotter.ActualHeight / 2 - circleItem.ellipse.Height / 2);
+        //        previousCircle = circleItem;
+        //        Plotter.Children.Add(circleItem.ellipse);
+        //    }
+        //}
+        private void AddCircleToGeometryGroup(Circle c)
         {
-            var previousCircle = (Circle)null;
-            foreach (var item in circlesDataGrid.Items.SourceCollection)
+            if (c != null)
             {
-                var circleItem = item as Circle;
-                if (previousCircle != null)
-                {
+                CanvasCenter.X += c.Radius - c.Radius/2;
+                c.ellipse = new EllipseGeometry(CanvasCenter, c.Radius, c.Radius);
+                ellipses.Children.Add(c.ellipse);
 
-                    circleItem.HorizontalRight = (int)(previousCircle.HorizontalRight + circleItem.ellipse.Width / 2);
-                    Canvas.SetLeft(circleItem.ellipse, previousCircle.HorizontalRight - circleItem.ellipse.Width / 2);
-                }
-                else
-                {
-                    circleItem.HorizontalRight = (int)(Plotter.ActualWidth / 2 + circleItem.ellipse.Width / 2);
-                    Canvas.SetLeft(circleItem.ellipse, Plotter.ActualWidth / 2 - circleItem.ellipse.Width / 2);
-                }
-                Canvas.SetTop(circleItem.ellipse, Plotter.ActualHeight / 2 - circleItem.ellipse.Height / 2);
-                previousCircle = circleItem;
-                Plotter.Children.Add(circleItem.ellipse);
+            }
+
+        }
+
+        private void CirclesDataGrid_OnLoadingRow(object? sender, DataGridRowEventArgs e)
+        {
+            var addedCircle = e.Row.Item as Circle;
+            0if (e.Row.IsNewItem && addedCircle != null)
+            {
+                AddCircleToGeometryGroup(addedCircle);
+
             }
         }
 
+        private void CirclesDataGrid_OnRowEditEnding(object? sender, DataGridRowEditEndingEventArgs e)
+        {
+            if (e.EditAction == DataGridEditAction.Commit)
+            {
+                var addedCircle = e.Row.Item as Circle;
+                AddCircleToGeometryGroup(addedCircle);
+
+            }
+        }
     }
 }
