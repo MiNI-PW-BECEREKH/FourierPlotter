@@ -17,7 +17,13 @@ namespace WPFLAB
     public class Circle : UIElement, INotifyPropertyChanged
     {
 
-        public EllipseGeometry ellipse = new EllipseGeometry();
+        public Ellipse ellipse = new Ellipse
+        {
+            Stroke = new SolidColorBrush(Colors.Black),
+            StrokeThickness = 1
+
+        };
+
 
         private int radius;
 
@@ -49,7 +55,9 @@ namespace WPFLAB
             {
                 case "Radius":
                 {
-                    ellipse = new EllipseGeometry(new Rect(new Size(Radius, Radius)));
+                    
+                    ellipse.Width = Radius;
+                    ellipse.Height = Radius;
 
                 }
                     break;

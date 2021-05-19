@@ -19,7 +19,7 @@
         <Grid Grid.Row="0">
             <Menu>
                 <MenuItem Header="File">
-                    <MenuItem Header="New">
+                    <MenuItem Header="New" >
 
                     </MenuItem>
                     <MenuItem Header="Open">
@@ -57,8 +57,8 @@
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
                 <GroupBox Header="Plotter" Grid.Column="0">
-                    <Image Name="Canvas" Loaded="Canvas_OnLoaded">
-                    </Image>
+                    <Canvas Name="Canvas" Loaded="Canvas_OnLoaded">
+                    </Canvas>
                 </GroupBox>
                 <GroupBox Header="Circles" Grid.Column="1" >
 

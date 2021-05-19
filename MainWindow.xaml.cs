@@ -40,11 +40,8 @@ namespace WPFLAB
 
         private DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         private Stopwatch stopwatch = new Stopwatch();
-        private bool IsPaused { get; set; } = false;
-        private GeometryGroup ellipses = new GeometryGroup();
-        private Point CanvasCenter = new Point();
-        private GeometryDrawing DrawnGeometries = new GeometryDrawing();
-        private DrawingImage DrawnImages = new DrawingImage();
+        private Point NewCircleLocation = new Point();
+
 
 
         public MainWindow()
@@ -68,11 +65,6 @@ namespace WPFLAB
             
             //this.DataContext = Circles;
             //((INotifyCollectionChanged)circlesDataGrid.Items).CollectionChanged += Circles_CollectionChanged;
-            
-            DrawnGeometries.Geometry = ellipses;
-            DrawnGeometries.Pen = new Pen(new SolidColorBrush(Colors.Black),2);
-            DrawnImages.Drawing = DrawnGeometries;
-            Canvas.Source = DrawnImages;
             //DrawCircles();
 
 
@@ -101,7 +93,12 @@ namespace WPFLAB
         }
         private void ExitMenuOption_Clicked(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            MessageBoxResult Result = MessageBox.Show(this, "Are you sure you want to exit?", "Leaving?", MessageBoxButton.OKCancel);
+            if (Result == MessageBoxResult.OK)
+            {
+                this.Close();
+
+            }
         }
 
         private void Start_Clicked(object sender, RoutedEventArgs e)
@@ -128,21 +125,29 @@ namespace WPFLAB
 
         private void MenuItem_OnChecked(object sender, RoutedEventArgs e)
         {
-            if(circlesDataGrid != null)
-            foreach (var item in circlesDataGrid.Items.SourceCollection)
-            {
-                Circle c = item as Circle;
-                //c.ellipse.Visibility = Visibility.Visible;
-            }
+            if (circlesDataGrid != null)
+                foreach (var item in Canvas.Children)
+                {
+                    if (item is Ellipse)
+                    {
+                        Ellipse ellipse = item as Ellipse;
+                        ellipse.Visibility = Visibility.Visible;
+
+                    }
+                }
         }
 
         private void MenuItem_OnUnchecked(object sender, RoutedEventArgs e)
         {
             if (circlesDataGrid != null)
-            foreach (var item in circlesDataGrid.Items.SourceCollection)
+            foreach (var item in Canvas.Children)
             {
-                Circle c = item as Circle;
-                //c.ellipse.Visibility = Visibility.Hidden;
+                if (item is Ellipse)
+                {
+                    Ellipse ellipse = item as Ellipse;
+                    ellipse.Visibility = Visibility.Hidden;
+
+                }
             }
         }
 
@@ -170,13 +175,14 @@ namespace WPFLAB
         //        Plotter.Children.Add(circleItem.ellipse);
         //    }
         //}
-        private void AddCircleToGeometryGroup(Circle c)
+        private void AddCircleToCanvas(Circle c)
         {
             if (c != null)
             {
-                CanvasCenter.X += c.Radius/2;
-                c.ellipse = new EllipseGeometry(CanvasCenter, c.Radius, c.Radius);
-                ellipses.Children.Add(c.ellipse);
+                Canvas.SetLeft(c.ellipse, NewCircleLocation.X - c.ellipse.Width/2);
+                Canvas.SetTop(c.ellipse,NewCircleLocation.Y - c.ellipse.Height/2);
+                Canvas.Children.Add(c.ellipse);
+                NewCircleLocation.X += c.Radius/2;
 
             }
 
@@ -187,19 +193,38 @@ namespace WPFLAB
             var addedCircle = e.Row.Item as Circle;
             if (addedCircle != null && addedCircle.Radius != 0)
             {
-                AddCircleToGeometryGroup(addedCircle);
+                AddCircleToCanvas(addedCircle);
 
             }
+            //Canvas.UpdateLayout();
         }
 
         private void CirclesDataGrid_OnRowEditEnding(object? sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                var addedCircle = e.Row.Item as Circle;
-                AddCircleToGeometryGroup(addedCircle);
+                var editedCircle = e.Row.Item as Circle;
 
-                
+                if (!Canvas.Children.Contains(editedCircle.ellipse))
+                {
+                    AddCircleToCanvas(editedCircle);
+                }
+                else
+                {
+                    Canvas.Children.Clear();
+                    NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+                    //var previousCircle = (Circle)null;
+                    foreach (var item in circlesDataGrid.Items.SourceCollection)
+                    {
+                        var circleItem = item as Circle;
+                        AddCircleToCanvas(circleItem);
+
+                    }
+                }
+
+
+                Canvas.UpdateLayout();
+
 
             }
         }
@@ -207,7 +232,7 @@ namespace WPFLAB
         private void Canvas_OnLoaded(object sender, RoutedEventArgs e)
         {
             //Image image = sender as Image;
-            CanvasCenter = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+            NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
         }
     }
 }
