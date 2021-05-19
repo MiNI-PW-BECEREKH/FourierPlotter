@@ -74,6 +74,12 @@ namespace WPFLAB
             Canvas.Source = DrawnImages;
             //DrawCircles();
 
+            foreach (Circle c in circlesDataGrid.Items.SourceCollection)
+            {
+                CanvasCenter.X += c.Radius / 2;
+            }
+
+
 
         }
 
@@ -183,7 +189,7 @@ namespace WPFLAB
         private void CirclesDataGrid_OnLoadingRow(object? sender, DataGridRowEventArgs e)
         {
             var addedCircle = e.Row.Item as Circle;
-            0if (e.Row.IsNewItem && addedCircle != null)
+            if (addedCircle != null && addedCircle.Radius != 0)
             {
                 AddCircleToGeometryGroup(addedCircle);
 

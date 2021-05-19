@@ -63,7 +63,7 @@
                 <GroupBox Header="Circles" Grid.Column="1" >
 
                     <Grid>
-                        <DataGrid RowEditEnding="CirclesDataGrid_OnRowEditEnding" LoadingRow="CirclesDataGrid_OnLoadingRow" ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged}"  AutoGenerateColumns="False" CanUserAddRows="True"
+                        <DataGrid RowEditEnding="CirclesDataGrid_OnRowEditEnding" LoadingRow="CirclesDataGrid_OnLoadingRow" ItemsSource="{Binding  }"  AutoGenerateColumns="False" CanUserAddRows="True"
                                   VerticalScrollBarVisibility="Visible"
                                   HorizontalAlignment="Center"
                                   Name="circlesDataGrid" 
@@ -72,8 +72,8 @@
                         >
                             <DataGrid.Columns >
 
-                                <DataGridTextColumn Header="Radius" Width="*" Binding="{Binding Mode=TwoWay,Path= Radius}" MinWidth="50" />
-                                <DataGridTextColumn Header="Frequency" Width="*" Binding="{Binding Mode=TwoWay, Path=Frequency }" MinWidth="50" />
+                                <DataGridTextColumn Header="Radius" Width="*" Binding="{Binding Mode=TwoWay,Path= Radius,UpdateSourceTrigger=PropertyChanged}" MinWidth="50" />
+                                <DataGridTextColumn Header="Frequency" Width="*" Binding="{Binding Mode=TwoWay, Path=Frequency,UpdateSourceTrigger=PropertyChanged }" MinWidth="50" />
                                 
                             </DataGrid.Columns>
                         </DataGrid>
