@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFLAB"
         mc:Ignorable="d"
-        Title="MainWindow" ResizeMode="NoResize" Height="800" Width="1000" WindowState="Maximized" Loaded="MainWindow_OnLoaded" WindowStyle="ToolWindow">
+        Title="MainWindow" ResizeMode="NoResize" Height="800" Width="1000" WindowState="Maximized" Loaded="MainWindow_OnLoaded" WindowStyle="None">
     <Window.Resources>
 
 
@@ -33,10 +33,10 @@
 
                 </MenuItem>
                 <MenuItem Header="_Options" >
-                    <MenuItem Header="_Draw Circles" IsCheckable="True" IsChecked="True" Checked="MenuItem_OnChecked" Unchecked="MenuItem_OnUnchecked">
+                    <MenuItem Header="_Draw Circles" IsCheckable="True" IsChecked="True" Checked="ShowCircles" Unchecked="HideCircles">
 
                     </MenuItem>
-                    <MenuItem Header="_Draw Lines" IsCheckable="True" IsChecked="True">
+                    <MenuItem Header="_Draw Lines" IsCheckable="True" IsChecked="True" Checked="ShowLines" Unchecked="HideLines">
 
                     </MenuItem>
 

@@ -26,6 +26,14 @@ namespace WPFLAB
 
         };
 
+        [XmlIgnore]
+        public Line line = new Line
+        {
+            Stroke = new SolidColorBrush(Colors.Black),
+            StrokeThickness = 1
+        };
+
+
         
         private int radius;
 

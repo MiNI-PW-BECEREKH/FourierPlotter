@@ -89,8 +89,14 @@ namespace WPFLAB
             if (stopwatch.Elapsed.TotalSeconds < 10)
             {
                 ProgressBar.Value = stopwatch.ElapsedMilliseconds;
-                //RotateTransform rt = new RotateTransform(10000/360);
-                //ellipses.Transform = rt;
+                foreach (Circle item in Circles)
+                {
+                    //we need to give center x and y to the rotate transform hence we might want to initiliaze all elements center
+                        //var rotatingCircle = item as Circle;
+                        //if(rotatingCircle.Frequency!=0 )
+                        //rotatingCircle.ellipse.RenderTransform = new RotateTransform(stopwatch.ElapsedMilliseconds / rotatingCircle.Frequency,);
+
+                }
             }
             else
             {
@@ -134,7 +140,7 @@ namespace WPFLAB
             //Plotter.Children.Clear();
         }
 
-        private void MenuItem_OnChecked(object sender, RoutedEventArgs e)
+        private void ShowCircles(object sender, RoutedEventArgs e)
         {
             if (circlesDataGrid != null)
                 foreach (var item in Canvas.Children)
@@ -148,7 +154,7 @@ namespace WPFLAB
                 }
         }
 
-        private void MenuItem_OnUnchecked(object sender, RoutedEventArgs e)
+        private void HideCircles(object sender, RoutedEventArgs e)
         {
             if (circlesDataGrid != null)
             foreach (var item in Canvas.Children)
@@ -160,6 +166,36 @@ namespace WPFLAB
 
                 }
             }
+        }
+
+
+
+        private void ShowLines(object sender, RoutedEventArgs e)
+        {
+            if (circlesDataGrid != null)
+                foreach (var item in Canvas.Children)
+                {
+                    if (item is Line)
+                    {
+                        Line line = item as Line;
+                        line.Visibility = Visibility.Visible;
+
+                    }
+                }
+        }
+
+        private void HideLines(object sender, RoutedEventArgs e)
+        {
+            if (circlesDataGrid != null)
+                foreach (var item in Canvas.Children)
+                {
+                    if (item is Line)
+                    {
+                        Line line = item as Line;
+                        line.Visibility = Visibility.Hidden;
+
+                    }
+                }
         }
 
 
@@ -190,17 +226,28 @@ namespace WPFLAB
         {
             if (c != null)
             {
-                if (c.ellipse == null)
-                    c.ellipse = new Ellipse
-                    {
-                        Stroke = new SolidColorBrush(Colors.Black),
-                        StrokeThickness = 1,
-                        Width = c.Radius,
-                        Height = c.Radius
-                    };
+                
+                c.ellipse = new Ellipse
+                {
+                    Stroke = new SolidColorBrush(Colors.Black),
+                    StrokeThickness = 1,
+                    Width = c.Radius,
+                    Height = c.Radius
+                };
+                c.line = new Line
+                {
+                    Stroke = new SolidColorBrush(Colors.Black),
+                    StrokeThickness = 1,
+                    X1= NewCircleLocation.X,
+                    Y1 = NewCircleLocation.Y,
+                    X2 = NewCircleLocation.X + c.Radius/2,
+                    Y2 = NewCircleLocation.Y
+                };
+
                 Canvas.SetLeft(c.ellipse, NewCircleLocation.X - c.ellipse.Width/2);
                 Canvas.SetTop(c.ellipse,NewCircleLocation.Y - c.ellipse.Height/2);
                 Canvas.Children.Add(c.ellipse);
+                Canvas.Children.Add(c.line);
                 NewCircleLocation.X += c.Radius/2;
 
             }
@@ -231,6 +278,7 @@ namespace WPFLAB
                 else
                 {
                     Canvas.Children.Clear();
+                    Canvas.UpdateLayout();
                     NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
                     //var previousCircle = (Circle)null;
                     foreach (var item in circlesDataGrid.Items.SourceCollection)
@@ -287,6 +335,7 @@ namespace WPFLAB
         {
             try
             {
+
                 OpenFileDialog openFileDialog = new OpenFileDialog();
                 {
                     openFileDialog.Filter = "xml files (*.xml) | *.xml";
@@ -302,9 +351,7 @@ namespace WPFLAB
                             XmlDictionaryReader reader =
                                 XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
 
-                            Circles = (ObservableCollection<Circle>)xmlSerializer.ReadObject(reader,true);
-                            stream.Close();
-                            circlesDataGrid.ItemsSource = Circles;
+
 
                             //RESET THE APP
                             ProgressBar.Value = 0;
@@ -313,6 +360,12 @@ namespace WPFLAB
                             Canvas.Children.Clear();
                             Circles.Clear();
                             NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+
+                            Circles = (ObservableCollection<Circle>)xmlSerializer.ReadObject(reader,true);
+                            circlesDataGrid.ItemsSource = Circles;
+                            stream.Close();
+
+
 
                         }
                     }
@@ -323,6 +376,5 @@ namespace WPFLAB
                 MessageBox.Show(exception.Message, "Error", MessageBoxButton.OK);
             }
         }
-
     }
 }
