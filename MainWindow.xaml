@@ -18,25 +18,25 @@
 
         <Grid Grid.Row="0">
             <Menu>
-                <MenuItem Header="File">
-                    <MenuItem Header="New" >
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New" Click="NewMenuOption_Clicked" >
 
                     </MenuItem>
-                    <MenuItem Header="Open">
+                    <MenuItem Header="_Open" Click="OpenMenuOption_Clicked">
 
                     </MenuItem>
-                    <MenuItem Header="Save">
+                    <MenuItem Header="_Save" Click="SaveMenuOption_Clicked">
 
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="Exit" Click="ExitMenuOption_Clicked">
+                <MenuItem Header="_Exit" Click="ExitMenuOption_Clicked">
 
                 </MenuItem>
-                <MenuItem Header="Options" >
-                    <MenuItem Header="Draw Circles" IsCheckable="True" IsChecked="True" Checked="MenuItem_OnChecked" Unchecked="MenuItem_OnUnchecked">
+                <MenuItem Header="_Options" >
+                    <MenuItem Header="_Draw Circles" IsCheckable="True" IsChecked="True" Checked="MenuItem_OnChecked" Unchecked="MenuItem_OnUnchecked">
 
                     </MenuItem>
-                    <MenuItem Header="Draw Lines" IsCheckable="True" IsChecked="True">
+                    <MenuItem Header="_Draw Lines" IsCheckable="True" IsChecked="True">
 
                     </MenuItem>
 

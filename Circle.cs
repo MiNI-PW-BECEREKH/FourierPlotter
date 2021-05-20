@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Ink;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 using WPFLAB.Annotations;
 
 namespace WPFLAB
 {
-
-    public class Circle : UIElement, INotifyPropertyChanged
+    [DataContract]
+    public class Circle :  INotifyPropertyChanged
     {
-
+        [XmlIgnore]
         public Ellipse ellipse = new Ellipse
         {
             Stroke = new SolidColorBrush(Colors.Black),
@@ -24,9 +26,10 @@ namespace WPFLAB
 
         };
 
-
+        
         private int radius;
 
+        [DataMember]
         public int Radius
         {
             get
@@ -40,8 +43,11 @@ namespace WPFLAB
             }
         }
 
+        [XmlIgnore]
         public int HorizontalRight { get; set; }
+        [DataMember]
         public int Frequency { get; set; }
+        [XmlIgnore]
         public Point Position { get; set; }
 
         public Circle()
@@ -65,6 +71,7 @@ namespace WPFLAB
             }
         }
 
+        
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

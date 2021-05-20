@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +22,9 @@ using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Xml;
+using System.Xml.Serialization;
+using Microsoft.Win32;
 
 namespace WPFLAB
 {
@@ -41,7 +46,7 @@ namespace WPFLAB
         private DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
         private Stopwatch stopwatch = new Stopwatch();
         private Point NewCircleLocation = new Point();
-
+        ObservableCollection<Circle> Circles = new ObservableCollection<Circle> { new Circle { Radius = 200, Frequency = 1 } };
 
 
         public MainWindow()
@@ -58,18 +63,24 @@ namespace WPFLAB
             var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
             SetWindowLong(hwnd, GWL_STYLE, GetWindowLong(hwnd, GWL_STYLE) & ~WS_SYSMENU);
 
-            ObservableCollection < Circle > Circles    = new ObservableCollection<Circle> { new Circle { Radius = 200, Frequency = 1 } };
-            this.DataContext = Circles;
+            
+            //circlesDataGrid.ItemsSource = Circles;
             timer.Interval = TimeSpan.FromMilliseconds(1);
             timer.Tick += Tick;
             
-            //this.DataContext = Circles;
-            //((INotifyCollectionChanged)circlesDataGrid.Items).CollectionChanged += Circles_CollectionChanged;
+            circlesDataGrid.ItemsSource = Circles;
+            ((INotifyCollectionChanged)Circles).CollectionChanged += Circles_CollectionChanged;
             //DrawCircles();
 
 
 
 
+        }
+
+        private void Circles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            Canvas.UpdateLayout();
+            circlesDataGrid.UpdateLayout();
         }
 
 
@@ -179,6 +190,14 @@ namespace WPFLAB
         {
             if (c != null)
             {
+                if (c.ellipse == null)
+                    c.ellipse = new Ellipse
+                    {
+                        Stroke = new SolidColorBrush(Colors.Black),
+                        StrokeThickness = 1,
+                        Width = c.Radius,
+                        Height = c.Radius
+                    };
                 Canvas.SetLeft(c.ellipse, NewCircleLocation.X - c.ellipse.Width/2);
                 Canvas.SetTop(c.ellipse,NewCircleLocation.Y - c.ellipse.Height/2);
                 Canvas.Children.Add(c.ellipse);
@@ -234,5 +253,76 @@ namespace WPFLAB
             //Image image = sender as Image;
             NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
         }
+
+        private void NewMenuOption_Clicked(object sender, RoutedEventArgs e)
+        {
+            ProgressBar.Value = 0;
+            stopwatch.Reset();
+            timer.Stop();
+            Canvas.Children.Clear();
+            Circles.Clear();
+            NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+        }
+
+        private void SaveMenuOption_Clicked(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "XML Files (*.xml)| *.xml";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
+            if (saveFileDialog.ShowDialog(this) == true)
+            {
+                if (saveFileDialog.FileName != "")
+                {
+                    var stream = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate, FileAccess.Write);
+                    var xmlSerializer = new DataContractSerializer(circlesDataGrid.Items.SourceCollection.GetType());
+                    xmlSerializer.WriteObject(stream, circlesDataGrid.Items.SourceCollection);
+                    stream.Close();
+                }
+            }
+        }
+
+
+        private void OpenMenuOption_Clicked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                {
+                    openFileDialog.Filter = "xml files (*.xml) | *.xml";
+                    openFileDialog.FilterIndex = 1;
+                    openFileDialog.RestoreDirectory = true;
+                    if (openFileDialog.ShowDialog(this) == true)
+                    {
+                        if (openFileDialog.FileName != "")
+                        {
+                            var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
+                            var xmlSerializer = new DataContractSerializer(Circles.GetType());
+
+                            XmlDictionaryReader reader =
+                                XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
+
+                            Circles = (ObservableCollection<Circle>)xmlSerializer.ReadObject(reader,true);
+                            stream.Close();
+                            circlesDataGrid.ItemsSource = Circles;
+
+                            //RESET THE APP
+                            ProgressBar.Value = 0;
+                            stopwatch.Reset();
+                            timer.Stop();
+                            Canvas.Children.Clear();
+                            Circles.Clear();
+                            NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
+
+                        }
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "Error", MessageBoxButton.OK);
+            }
+        }
+
     }
 }
