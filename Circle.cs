@@ -32,7 +32,7 @@ namespace WPFLAB
             Stroke = new SolidColorBrush(Colors.Black),
             StrokeThickness = 1
         };
-
+        
 
         
         private int radius;
@@ -50,6 +50,9 @@ namespace WPFLAB
                 OnPropertyChanged();
             }
         }
+
+        [XmlIgnore]
+        public double angle { get; set; }
 
         [XmlIgnore] public Circle previousCircle = (Circle)null;
 

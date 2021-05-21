@@ -97,45 +97,69 @@ namespace WPFLAB
                     prv = item;
                 }
 
-                //var previousCircle = (Circle) null;
+                ////var previousCircle = (Circle) null;
+                //foreach (Circle item in Circles)
+                //{
+                //    //we need to give center x and y to the rotate transform hence we might want to initiliaze all elements center
+                //    var rotatingCircle = item as Circle;
+                //    if (rotatingCircle.Frequency != 0)
+                //    {
+
+                        
+                //        //rotatingCircle.ellipse.RenderTransformOrigin = rotatingCircle.Center;
+                //        rotatingCircle.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value*rotatingCircle.angle, rotatingCircle.Radius/2,rotatingCircle.Radius/2);
+
+                //        var c = rotatingCircle;
+                //        while (c.previousCircle != null)
+                //        {
+                //            RotateTransform rt = new RotateTransform(ProgressBar.Value * c.previousCircle.angle, Canvas.TranslatePoint(c.previousCircle.Center, c.ellipse).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, c.ellipse).Y);
+                //            rotatingCircle.ellipse.RenderTransform = rt;
+
+                //            c = c.previousCircle;
+                //            //rotatingCircle.ellipse.RenderTransform = new TranslateTransform(Math.Cos(angle)* rotatingCircle.previousCircle.Radius, Math.Sin(angle) * rotatingCircle.previousCircle.Radius);
+
+                //        }
+
+
+                //        rotatingCircle.line.RenderTransform =
+                //            new RotateTransform(ProgressBar.Value * rotatingCircle.angle, rotatingCircle.Center.X, rotatingCircle.Center.Y);
+                //        if (rotatingCircle.previousCircle != null)
+                //            rotatingCircle.line.RenderTransform = new RotateTransform(ProgressBar.Value *
+                //                rotatingCircle.angle, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).Y);
+
+                        
+
+                //        //if (previousCircle != null)
+                //        //    rotatingCircle.Center =
+                //        //    new Point(Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).X,
+                //        //        Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).Y);
+                        
+                //    }
+
+                //}
+
+                //let's try to rewrite above code
                 foreach (Circle item in Circles)
                 {
-                    //we need to give center x and y to the rotate transform hence we might want to initiliaze all elements center
-                    var rotatingCircle = item as Circle;
-                    if (rotatingCircle.Frequency != 0)
+                    //VISIT AGAIN LATER TO FINISH --> COULD IMPLEMENT AI TO DO SOMETHING SIMILAR AS IN https://gofigure.impara.ai/inspiration
+                    //CIRCLES ARE NOT ROTATING PROPERLY AROUND EACH OTHER, FREQUENCY CALCULATIONS ARE NOT WORKING
+                    //COULD HAVE USED GEOMETRY CLASSES IN WPF
+
+
+                    //item.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value/27.5 *item.Frequency , item.Radius / 2, item.Radius / 2);
+                    item.line.RenderTransform = new RotateTransform(ProgressBar.Value  *item.Frequency, item.Center.X, item.Center.Y);
+
+                    //rotate circle around previous circles
+                    var currentCircle = item;
+                    while (currentCircle.previousCircle != null)
                     {
                         
-                        var angle = ProgressBar.Value/36 * Math.PI * rotatingCircle.Frequency;
-                        //rotatingCircle.ellipse.RenderTransformOrigin = rotatingCircle.Center;
-                        rotatingCircle.ellipse.RenderTransform = new RotateTransform(angle,rotatingCircle.Radius/2,rotatingCircle.Radius/2);
+                        item.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value  * item.previousCircle.Frequency, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.ellipse).X, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.ellipse).Y);
+                        item.line.RenderTransform = new RotateTransform(ProgressBar.Value  * item.previousCircle.Frequency, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.line).X, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.line).Y);
 
-                        var c = rotatingCircle;
-                        while (c.previousCircle != null)
-                        {
-                            RotateTransform rt = new RotateTransform(angle, Canvas.TranslatePoint(c.previousCircle.Center, c.ellipse).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, c.ellipse).Y);
-                            c.ellipse.RenderTransform = rt;
-
-                            c = c.previousCircle;
-                            //rotatingCircle.ellipse.RenderTransform = new TranslateTransform(Math.Cos(angle)* rotatingCircle.previousCircle.Radius, Math.Sin(angle) * rotatingCircle.previousCircle.Radius);
-
-                        }
-
-
-                        rotatingCircle.line.RenderTransform =
-                            new RotateTransform(angle, rotatingCircle.Center.X, rotatingCircle.Center.Y);
-                        if (rotatingCircle.previousCircle != null)
-                            rotatingCircle.line.RenderTransform = new RotateTransform(
-                                angle, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).Y);
-
-                        
-
-                        //if (previousCircle != null)
-                        //    rotatingCircle.Center =
-                        //    new Point(Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).X,
-                        //        Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).Y);
-                        
+                        currentCircle = currentCircle.previousCircle;
                     }
-
+                    
                 }
 
             }
@@ -288,21 +312,22 @@ namespace WPFLAB
                     X2 = NewCircleLocation.X + c.Radius/2,
                     Y2 = NewCircleLocation.Y
                 };
+                c.angle =  Math.PI * c.Frequency/100;
                 c.Center = new Point(NewCircleLocation.X , NewCircleLocation.Y );
                 Canvas.SetLeft(c.ellipse, NewCircleLocation.X - c.ellipse.Width/2);
                 Canvas.SetTop(c.ellipse,NewCircleLocation.Y - c.ellipse.Height/2);
                 Canvas.Children.Add(c.ellipse);
                 Canvas.Children.Add(c.line);
-                Ellipse temp = new Ellipse
-                {
-                    Stroke = new SolidColorBrush(Colors.Red),
-                    StrokeThickness = 5,
-                    Width = 5,
-                    Height = 5
-                };
-                Canvas.SetLeft(temp, NewCircleLocation.X);
-                Canvas.SetTop(temp, NewCircleLocation.Y );
-                Canvas.Children.Add(temp);
+                //Ellipse temp = new Ellipse
+                //{
+                //    Stroke = new SolidColorBrush(Colors.Red),
+                //    StrokeThickness = 5,
+                //    Width = 5,
+                //    Height = 5
+                //};
+                //Canvas.SetLeft(temp, NewCircleLocation.X);
+                //Canvas.SetTop(temp, NewCircleLocation.Y );
+                //Canvas.Children.Add(temp);
                 NewCircleLocation.X += c.Radius/2;
                 c.HorizontalRight = NewCircleLocation;
 
