@@ -51,12 +51,14 @@ namespace WPFLAB
             }
         }
 
+        [XmlIgnore] public Circle previousCircle = (Circle)null;
+
         [XmlIgnore]
-        public int HorizontalRight { get; set; }
+        public Point HorizontalRight { get; set; }
         [DataMember]
         public int Frequency { get; set; }
         [XmlIgnore]
-        public Point Position { get; set; }
+        public Point Center { get; set; }
 
         public Circle()
         {

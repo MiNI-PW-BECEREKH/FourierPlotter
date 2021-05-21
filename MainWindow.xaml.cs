@@ -89,14 +89,55 @@ namespace WPFLAB
             if (stopwatch.Elapsed.TotalSeconds < 10)
             {
                 ProgressBar.Value = stopwatch.ElapsedMilliseconds;
+
+                var prv = (Circle) null;
+                foreach (Circle item in Circles)
+                {
+                    item.previousCircle = prv;
+                    prv = item;
+                }
+
+                //var previousCircle = (Circle) null;
                 foreach (Circle item in Circles)
                 {
                     //we need to give center x and y to the rotate transform hence we might want to initiliaze all elements center
-                        //var rotatingCircle = item as Circle;
-                        //if(rotatingCircle.Frequency!=0 )
-                        //rotatingCircle.ellipse.RenderTransform = new RotateTransform(stopwatch.ElapsedMilliseconds / rotatingCircle.Frequency,);
+                    var rotatingCircle = item as Circle;
+                    if (rotatingCircle.Frequency != 0)
+                    {
+                        
+                        var angle = ProgressBar.Value/36 * Math.PI * rotatingCircle.Frequency;
+                        //rotatingCircle.ellipse.RenderTransformOrigin = rotatingCircle.Center;
+                        rotatingCircle.ellipse.RenderTransform = new RotateTransform(angle,rotatingCircle.Radius/2,rotatingCircle.Radius/2);
+
+                        var c = rotatingCircle;
+                        while (c.previousCircle != null)
+                        {
+                            RotateTransform rt = new RotateTransform(angle, Canvas.TranslatePoint(c.previousCircle.Center, c.ellipse).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, c.ellipse).Y);
+                            c.ellipse.RenderTransform = rt;
+
+                            c = c.previousCircle;
+                            //rotatingCircle.ellipse.RenderTransform = new TranslateTransform(Math.Cos(angle)* rotatingCircle.previousCircle.Radius, Math.Sin(angle) * rotatingCircle.previousCircle.Radius);
+
+                        }
+
+
+                        rotatingCircle.line.RenderTransform =
+                            new RotateTransform(angle, rotatingCircle.Center.X, rotatingCircle.Center.Y);
+                        if (rotatingCircle.previousCircle != null)
+                            rotatingCircle.line.RenderTransform = new RotateTransform(
+                                angle, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).Y);
+
+                        
+
+                        //if (previousCircle != null)
+                        //    rotatingCircle.Center =
+                        //    new Point(Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).X,
+                        //        Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).Y);
+                        
+                    }
 
                 }
+
             }
             else
             {
@@ -118,10 +159,14 @@ namespace WPFLAB
             }
         }
 
+
         private void Start_Clicked(object sender, RoutedEventArgs e)
         {
             timer.Start();
             stopwatch.Start();
+
+
+            
 
 
         }
@@ -243,12 +288,23 @@ namespace WPFLAB
                     X2 = NewCircleLocation.X + c.Radius/2,
                     Y2 = NewCircleLocation.Y
                 };
-
+                c.Center = new Point(NewCircleLocation.X , NewCircleLocation.Y );
                 Canvas.SetLeft(c.ellipse, NewCircleLocation.X - c.ellipse.Width/2);
                 Canvas.SetTop(c.ellipse,NewCircleLocation.Y - c.ellipse.Height/2);
                 Canvas.Children.Add(c.ellipse);
                 Canvas.Children.Add(c.line);
+                Ellipse temp = new Ellipse
+                {
+                    Stroke = new SolidColorBrush(Colors.Red),
+                    StrokeThickness = 5,
+                    Width = 5,
+                    Height = 5
+                };
+                Canvas.SetLeft(temp, NewCircleLocation.X);
+                Canvas.SetTop(temp, NewCircleLocation.Y );
+                Canvas.Children.Add(temp);
                 NewCircleLocation.X += c.Radius/2;
+                c.HorizontalRight = NewCircleLocation;
 
             }
 
@@ -323,8 +379,8 @@ namespace WPFLAB
                 if (saveFileDialog.FileName != "")
                 {
                     var stream = new FileStream(saveFileDialog.FileName, FileMode.OpenOrCreate, FileAccess.Write);
-                    var xmlSerializer = new DataContractSerializer(circlesDataGrid.Items.SourceCollection.GetType());
-                    xmlSerializer.WriteObject(stream, circlesDataGrid.Items.SourceCollection);
+                    var xmlSerializer = new XmlSerializer(circlesDataGrid.Items.SourceCollection.GetType());
+                    xmlSerializer.Serialize(stream, circlesDataGrid.Items.SourceCollection);
                     stream.Close();
                 }
             }
@@ -346,10 +402,10 @@ namespace WPFLAB
                         if (openFileDialog.FileName != "")
                         {
                             var stream = new FileStream(openFileDialog.FileName, FileMode.Open, FileAccess.Read);
-                            var xmlSerializer = new DataContractSerializer(Circles.GetType());
+                            var xmlSerializer = new XmlSerializer(circlesDataGrid.Items.SourceCollection.GetType());
 
-                            XmlDictionaryReader reader =
-                                XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
+                            //XmlDictionaryReader reader =
+                            //    XmlDictionaryReader.CreateTextReader(stream, new XmlDictionaryReaderQuotas());
 
 
 
@@ -361,7 +417,7 @@ namespace WPFLAB
                             Circles.Clear();
                             NewCircleLocation = new Point(Canvas.ActualWidth / 2, Canvas.ActualHeight / 2);
 
-                            Circles = (ObservableCollection<Circle>)xmlSerializer.ReadObject(reader,true);
+                            Circles = (ObservableCollection<Circle>)xmlSerializer.Deserialize(stream);
                             circlesDataGrid.ItemsSource = Circles;
                             stream.Close();
 
