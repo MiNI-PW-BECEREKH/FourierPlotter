@@ -86,57 +86,18 @@ namespace WPFLAB
 
         public async void Tick(object sender, EventArgs e)
         {
-            if (stopwatch.Elapsed.TotalSeconds < 10)
+            if (stopwatch.Elapsed.TotalSeconds <= 11)
             {
                 ProgressBar.Value = stopwatch.ElapsedMilliseconds;
 
                 var prv = (Circle) null;
-                foreach (Circle item in Circles)
+                for(int i = 0 ; i < Circles.Count; i++)
                 {
-                    item.previousCircle = prv;
-                    prv = item;
+                    Circles[i].PreviousCircle = i - 1 < 0 ? (Circle)null : Circles[i - 1];
+                    Circles[i].NextCircle = i + 1 >= Circles.Count ? (Circle)null : Circles[i + 1];
                 }
 
-                ////var previousCircle = (Circle) null;
-                //foreach (Circle item in Circles)
-                //{
-                //    //we need to give center x and y to the rotate transform hence we might want to initiliaze all elements center
-                //    var rotatingCircle = item as Circle;
-                //    if (rotatingCircle.Frequency != 0)
-                //    {
-
-                        
-                //        //rotatingCircle.ellipse.RenderTransformOrigin = rotatingCircle.Center;
-                //        rotatingCircle.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value*rotatingCircle.angle, rotatingCircle.Radius/2,rotatingCircle.Radius/2);
-
-                //        var c = rotatingCircle;
-                //        while (c.previousCircle != null)
-                //        {
-                //            RotateTransform rt = new RotateTransform(ProgressBar.Value * c.previousCircle.angle, Canvas.TranslatePoint(c.previousCircle.Center, c.ellipse).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, c.ellipse).Y);
-                //            rotatingCircle.ellipse.RenderTransform = rt;
-
-                //            c = c.previousCircle;
-                //            //rotatingCircle.ellipse.RenderTransform = new TranslateTransform(Math.Cos(angle)* rotatingCircle.previousCircle.Radius, Math.Sin(angle) * rotatingCircle.previousCircle.Radius);
-
-                //        }
-
-
-                //        rotatingCircle.line.RenderTransform =
-                //            new RotateTransform(ProgressBar.Value * rotatingCircle.angle, rotatingCircle.Center.X, rotatingCircle.Center.Y);
-                //        if (rotatingCircle.previousCircle != null)
-                //            rotatingCircle.line.RenderTransform = new RotateTransform(ProgressBar.Value *
-                //                rotatingCircle.angle, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).X, Canvas.TranslatePoint(rotatingCircle.previousCircle.Center, rotatingCircle.line).Y);
-
-                        
-
-                //        //if (previousCircle != null)
-                //        //    rotatingCircle.Center =
-                //        //    new Point(Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).X,
-                //        //        Canvas.TranslatePoint(previousCircle.Center, rotatingCircle.ellipse).Y);
-                        
-                //    }
-
-                //}
+                //change is inevidable I am making the mistake of not handling the change
 
                 //let's try to rewrite above code
                 foreach (Circle item in Circles)
@@ -144,22 +105,24 @@ namespace WPFLAB
                     //VISIT AGAIN LATER TO FINISH --> COULD IMPLEMENT AI TO DO SOMETHING SIMILAR AS IN https://gofigure.impara.ai/inspiration
                     //CIRCLES ARE NOT ROTATING PROPERLY AROUND EACH OTHER, FREQUENCY CALCULATIONS ARE NOT WORKING
                     //COULD HAVE USED GEOMETRY CLASSES IN WPF
+                    TransformGroup myTransforms = new TransformGroup();
 
-
+                    myTransforms.Children.Add(new RotateTransform(ProgressBar.Value / 10000 * 100 * 3.6 * item.Frequency, item.Center.X, item.Center.Y));
                     //item.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value/27.5 *item.Frequency , item.Radius / 2, item.Radius / 2);
-                    item.line.RenderTransform = new RotateTransform(ProgressBar.Value  *item.Frequency, item.Center.X, item.Center.Y);
+                    //item.line.RenderTransform = 
+                    Debug.WriteLine(ProgressBar.Value/10000*100 * 3.6);
 
                     //rotate circle around previous circles
-                    var currentCircle = item;
-                    while (currentCircle.previousCircle != null)
+                    for(int i = Circles.IndexOf(item); 0<i; i--)
                     {
-                        
-                        item.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value  * item.previousCircle.Frequency, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.ellipse).X, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.ellipse).Y);
-                        item.line.RenderTransform = new RotateTransform(ProgressBar.Value  * item.previousCircle.Frequency, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.line).X, Canvas.TranslatePoint(currentCircle.previousCircle.Center, item.line).Y);
-
-                        currentCircle = currentCircle.previousCircle;
+                        myTransforms.Children.Add(new RotateTransform(ProgressBar.Value / 10000 * 100 * 3.6 * Circles[i].Frequency, Circles[i-1].Center.X, Circles[i - 1].Center.Y));
+                        //item.ellipse.RenderTransform = new RotateTransform(ProgressBar.Value / 10000 * 100 * 3.6 * currentCircle.PreviousCircle.Frequency, Canvas.TranslatePoint(currentCircle.PreviousCircle.Center, item.ellipse).X, Canvas.TranslatePoint(currentCircle.PreviousCircle.Center, item.ellipse).Y);
+                        //item.line.RenderTransform = new RotateTransform(ProgressBar.Value / 10000 * 100 * 3.6 * currentCircle.Frequency, Canvas.TranslatePoint(currentCircle.Center, item.line).X, Canvas.TranslatePoint(currentCircle.Center, item.line).Y);
                     }
-                    
+
+                    //item.ellipse.RenderTransform = myTransforms;
+                    item.line.RenderTransform = myTransforms;
+
                 }
 
             }

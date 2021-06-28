@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\suhey\\Desktop\\WPFLAB\\WPFLAB.csproj",
+      "projectUniqueName": "C:\\Users\\suhey\\Desktop\\FourierPlotter\\WPFLAB.csproj",
       "projectName": "WPFLAB",
-      "projectPath": "C:\\Users\\suhey\\Desktop\\WPFLAB\\WPFLAB.csproj",
+      "projectPath": "C:\\Users\\suhey\\Desktop\\FourierPlotter\\WPFLAB.csproj",
       "packagesPath": "C:\\Users\\suhey\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\suhey\\Desktop\\WPFLAB\\obj\\",
+      "outputPath": "C:\\Users\\suhey\\Desktop\\FourierPlotter\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\suhey\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -63,7 +63,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.203\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.204\\RuntimeIdentifierGraph.json"
       }
     }
   }

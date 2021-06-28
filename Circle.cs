@@ -54,7 +54,8 @@ namespace WPFLAB
         [XmlIgnore]
         public double angle { get; set; }
 
-        [XmlIgnore] public Circle previousCircle = (Circle)null;
+        [XmlIgnore] public Circle PreviousCircle = (Circle)null;
+        [XmlIgnore] public Circle NextCircle = (Circle)null;
 
         [XmlIgnore]
         public Point HorizontalRight { get; set; }
